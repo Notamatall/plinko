@@ -25,7 +25,7 @@ const PlinkoProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const addToBalance = useCallback((value: number) => {
     const newValue = localBalanceRef.current + value;
-    const flooredValue = Math.floor(newValue);
+    const flooredValue = Math.floor(newValue * 100) / 100;
     localBalanceRef.current = flooredValue;
     setLocalBalance(flooredValue);
   }, []);
