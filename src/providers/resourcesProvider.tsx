@@ -6,13 +6,20 @@ import { getProviderGamePath, loadImageAsync } from "utils/index";
 
 const ResourcesProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [animations, setAnimations] = useState<PlinkoRowAnimations>({});
-  const [loadingQueue, setLoadingQueue] = useState<LoadingActions[]>([]);
+  const [loadingQueue, setLoadingQueue] = useState<LoadingActions[]>([
+    LoadingActions.ROW_ANIMATIONS,
+    LoadingActions.PEG,
+    LoadingActions.BALL,
+    LoadingActions.SPARKS,
+    LoadingActions.CACHING_IMAGES,
+  ]);
+
   const [sparksImage, setSparksImage] = useState<HTMLImageElement>(new Image());
   const [ballImage, setBallImage] = useState<HTMLImageElement>(new Image());
   const [collidingPegImage, setCollidingPegImage] = useState<HTMLImageElement>(new Image());
 
   const pushLoadingAction = useCallback((action: LoadingActions) => {
-    setLoadingQueue(prev => [...prev, action]);
+    setLoadingQueue(prev => (prev.includes(action) ? prev : [...prev, action]));
   }, []);
 
   const popLoadingAction = useCallback((action: LoadingActions) => {
@@ -33,8 +40,6 @@ const ResourcesProvider: React.FC<PropsWithChildren> = ({ children }) => {
           "fifteen-rows-animation.json",
           "sixteen-rows-animation.json",
         ].map(fileName => getProviderGamePath("animations", fileName));
-
-        pushLoadingAction(LoadingActions.ROW_ANIMATIONS);
 
         const fetchPromises = files.map(file => fetch(file).then(response => response.json()));
         const animationsJsons = await Promise.all(fetchPromises);
@@ -60,10 +65,6 @@ const ResourcesProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     async function loadImages() {
       try {
-        pushLoadingAction(LoadingActions.PEG);
-        pushLoadingAction(LoadingActions.BALL);
-        pushLoadingAction(LoadingActions.SPARKS);
-
         const loadPeg = loadImageAsync(getProviderGamePath("images", "peg.png"));
         const loadBall = loadImageAsync(getProviderGamePath("images", "ball.svg"));
         const loadSparks = loadImageAsync(getProviderGamePath("images", "sparks.svg"));
@@ -87,7 +88,6 @@ const ResourcesProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     async function loadImages() {
       try {
-        pushLoadingAction(LoadingActions.CACHING_IMAGES);
         await Promise.all([
           loadImageAsync(getProviderGamePath("images", "infinity.svg")),
           loadImageAsync(getProviderGamePath("images", "sound-off.svg")),

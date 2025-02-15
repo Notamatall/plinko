@@ -21,6 +21,7 @@ if (rootElement) {
           </SlotifyProvider>
         </PlinkoAudioProvider>
       </ResourcesProvider>
+      ,
     </StrictMode>,
   );
 } else {
